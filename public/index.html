@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BizLens â Score Your Business Idea</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#1a1a2e;--navy-light:#25254a;--navy-mid:#16213e;
+  --amber:#e8a838;--amber-light:#f5c563;--amber-dark:#c98b1d;
+  --surface:#f8f7f4;--card:#ffffff;--text:#2c2c3a;--text-light:#6b6b80;
+  --green:#34a853;--red:#ea4335;--blue:#4285f4;
+  --radius:10px;--shadow:0 2px 12px rgba(26,26,46,0.08);
+}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--surface);color:var(--text);min-height:100vh}
+h1,h2,h3,.brand{font-family:'Outfit',sans-serif}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+input,select,textarea{font-family:inherit;outline:none}
+
+/* ââ Toast ââ */
+.toast{position:fixed;top:24px;right:24px;padding:14px 22px;border-radius:var(--radius);color:#fff;font-size:14px;font-weight:500;z-index:9999;transform:translateX(120%);transition:transform .3s ease;max-width:360px}
+.toast.show{transform:translateX(0)}
+.toast.error{background:var(--red)}
+.toast.success{background:var(--green)}
+
+/* ââ Landing Page ââ */
+.landing{min-height:100vh;background:var(--navy)}
+.landing-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;max-width:1200px;margin:0 auto}
+.brand{color:var(--amber);font-size:24px;font-weight:800;letter-spacing:-0.5px}
+.brand span{color:#fff}
+.nav-btns{display:flex;gap:12px}
+.btn{padding:10px 24px;border-radius:var(--radius);font-weight:600;font-size:14px;transition:all .2s}
+.btn-ghost{background:transparent;color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.15)}
+.btn-ghost:hover{background:rgba(255,255,255,0.06);color:#fff}
+.btn-primary{background:var(--amber);color:var(--navy)}
+.btn-primary:hover{background:var(--amber-light)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#d33426}
+.btn-outline{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+.btn-outline:hover{background:var(--navy);color:#fff}
+
+.hero{max-width:1200px;margin:0 auto;padding:80px 48px 60px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:60px;align-items:center}
+.hero-tag{display:inline-block;background:rgba(232,168,56,0.12);color:var(--amber);font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;margin-bottom:20px}
+.hero h1{color:#fff;font-size:52px;line-height:1.12;letter-spacing:-1.5px;margin-bottom:20px}
+.hero h1 em{color:var(--amber);font-style:normal}
+.hero p{color:rgba(255,255,255,0.6);font-size:17px;line-height:1.7;margin-bottom:32px;max-width:480px}
+.hero-cta{display:flex;gap:14px}
+.hero-visual{background:var(--navy-light);border-radius:16px;padding:32px;border:1px solid rgba(255,255,255,0.06)}
+.hero-visual .stat-row{display:flex;gap:16px;margin-bottom:16px}
+.mini-card{flex:1;background:rgba(255,255,255,0.04);border-radius:var(--radius);padding:16px;border:1px solid rgba(255,255,255,0.05)}
+.mini-card .label{font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.mini-card .value{font-size:22px;font-weight:700;color:#fff;font-family:'Outfit',sans-serif}
+.mini-card .value.amber{color:var(--amber)}
+.mini-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;margin-top:10px;overflow:hidden}
+.mini-bar-fill{height:100%;border-radius:3px;background:var(--amber)}
+
+.features{max-width:1200px;margin:0 auto;padding:40px 48px 80px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{background:var(--navy-light);border-radius:14px;padding:28px;border:1px solid rgba(255,255,255,0.05)}
+.feature-icon{width:42px;height:42px;background:rgba(232,168,56,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
+.feature-card h3{color:#fff;font-size:16px;margin-bottom:8px}
+.feature-card p{color:rgba(255,255,255,0.45);font-size:13px;line-height:1.6}
+
+/* ââ Auth Modal ââ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.active{opacity:1;pointer-events:all}
+.modal{background:var(--card);border-radius:16px;padding:40px;width:420px;max-width:90vw;position:relative}
+.modal h2{font-size:24px;margin-bottom:6px}
+.modal .sub{color:var(--text-light);font-size:14px;margin-bottom:28px}
+.modal .close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-light)}
+.modal .close:hover{background:#eee}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:2px solid #e5e5ea;border-radius:var(--radius);font-size:14px;transition:border-color .2s;background:#fff}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--amber)}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-submit{width:100%;padding:13px;background:var(--amber);color:var(--navy);border-radius:var(--radius);font-weight:700;font-size:15px;margin-top:6px}
+.form-submit:hover{background:var(--amber-light)}
+.form-switch{text-align:center;margin-top:18px;font-size:13px;color:var(--text-light)}
+.form-switch a{color:var(--amber-dark);font-weight:600;cursor:pointer}
+
+/* ââ App Shell ââ */
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:var(--navy);padding:24px 0;display:flex;flex-direction:column}
+.sidebar .brand{padding:0 24px;margin-bottom:36px;font-size:22px}
+.sidebar nav{flex:1}
+.sidebar nav a{display:flex;align-items:center;gap:12px;padding:11px 24px;color:rgba(255,255,255,0.5);font-size:14px;font-weight:500;transition:all .15s;border-left:3px solid transparent}
+.sidebar nav a:hover{color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.03)}
+.sidebar nav a.active{color:var(--amber);background:rgba(232,168,56,0.06);border-left-color:var(--amber)}
+.sidebar nav a .icon{width:20px;text-align:center;font-size:16px}
+.sidebar .user-block{padding:16px 24px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px}
+.sidebar .user-avatar{width:34px;height:34px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--navy)}
+.sidebar .user-info{flex:1}
+.sidebar .user-info .name{color:#fff;font-size:13px;font-weight:600}
+.sidebar .user-info .email{color:rgba(255,255,255,0.35);font-size:11px}
+.sidebar .logout-btn{color:rgba(255,255,255,0.3);background:none;font-size:16px;padding:4px}
+.sidebar .logout-btn:hover{color:var(--red)}
+
+.main{padding:32px 40px;overflow-y:auto;max-height:100vh}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-header h1{font-size:26px;letter-spacing:-0.5px}
+
+/* ââ Dashboard ââ */
+.stat-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:32px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.stat-card .stat-label{font-size:12px;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.stat-card .stat-value{font-size:32px;font-weight:700;font-family:'Outfit',sans-serif;color:var(--navy)}
+.stat-card .stat-value.amber{color:var(--amber-dark)}
+
+.top-ideas{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+.top-ideas h3{font-size:16px;margin-bottom:16px;color:var(--navy)}
+.top-idea-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.top-idea-row:last-child{border-bottom:none}
+.top-idea-rank{width:28px;height:28px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-light);margin-right:14px}
+.top-idea-name{flex:1;font-weight:500;font-size:14px}
+.top-idea-score{font-weight:700;font-family:'Outfit',sans-serif;font-size:15px;margin-right:10px}
+.grade-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;font-family:'Outfit',sans-serif}
+.grade-a{background:rgba(52,168,83,0.1);color:var(--green)}
+.grade-b{background:rgba(66,133,244,0.1);color:var(--blue)}
+.grade-c{background:rgba(232,168,56,0.1);color:var(--amber-dark)}
+.grade-d{background:rgba(234,67,53,0.1);color:var(--red)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-light)}
+.empty-state .empty-icon{font-size:48px;margin-bottom:16px;opacity:0.4}
+.empty-state p{font-size:15px;margin-bottom:20px}
+
+/* ââ Ideas List ââ */
+.ideas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.idea-card{background:var(--card);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;border-left:4px solid transparent}
+.idea-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(26,26,46,0.12)}
+.idea-card.scored{border-left-color:var(--green)}
+.idea-card.draft{border-left-color:var(--text-light)}
+.idea-card h3{font-size:16px;margin-bottom:6px}
+.idea-card .idea-desc{font-size:13px;color:var(--text-light);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.idea-card .idea-meta{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-light)}
+.idea-card .idea-score-pill{font-weight:700;font-family:'Outfit',sans-serif}
+.idea-card .delete-btn{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-light);opacity:0;transition:opacity .2s}
+.idea-card:hover .delete-btn{opacity:1}
+.idea-card .delete-btn:hover{background:var(--red);color:#fff}
+
+/* ââ Scoring Wizard ââ */
+.wizard{background:var(--card);border-radius:14px;padding:32px;box-shadow:var(--shadow);max-width:700px}
+.wizard-progress{display:flex;gap:6px;margin-bottom:28px}
+.wizard-progress .step{flex:1;height:5px;border-radius:3px;background:#eee}
+.wizard-progress .step.done{background:var(--green)}
+.wizard-progress .step.current{background:var(--amber)}
+.wizard-step{display:none}
+.wizard-step.active{display:block}
+.wizard-step h3{font-size:18px;margin-bottom:4px}
+.wizard-step .step-desc{color:var(--text-light);font-size:13px;margin-bottom:24px}
+.metric-group{margin-bottom:22px}
+.metric-group label{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:10px}
+.metric-group label .score-display{font-family:'Outfit',sans-serif;font-weight:700;color:var(--amber-dark);font-size:16px}
+.metric-slider{width:100%;-webkit-appearance:none;height:8px;border-radius:4px;background:#eee;outline:none}
+.metric-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--amber);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.15)}
+.metric-hint{font-size:11px;color:var(--text-light);margin-top:4px}
+.wizard-nav{display:flex;justify-content:space-between;margin-top:28px;padding-top:20px;border-top:1px solid #f0f0f0}
+
+/* ââ Score Result ââ */
+.score-result{text-align:center;padding:40px 20px}
+.score-circle{width:140px;height:140px;border-radius:50%;border:6px solid var(--amber);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px}
+.score-circle .number{font-size:42px;font-weight:800;font-family:'Outfit',sans-serif;color:var(--navy);line-height:1}
+.score-circle .out-of{font-size:12px;color:var(--text-light)}
+.score-grade{font-size:28px;font-weight:800;font-family:'Outfit',sans-serif;margin-bottom:8px}
+.score-verdict{font-size:15px;color:var(--text-light);margin-bottom:28px}
+.score-breakdown{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;text-align:left;max-width:500px;margin:0 auto}
+.breakdown-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface);border-radius:6px;font-size:13px}
+.breakdown-item .metric-name{color:var(--text)}
+.breakdown-item .metric-val{font-weight:700;font-family:'Outfit',sans-serif}
+
+/* ââ Radar Chart ââ */
+.radar-wrap{display:flex;justify-content:center;margin:24px 0}
+canvas#radarChart{max-width:320px;max-height:320px}
+
+/* ââ Responsive ââ */
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;padding:40px 20px}
+  .hero-visual{display:none}
+  .features{grid-template-columns:1fr;padding:20px}
+  .landing-nav{padding:16px 20px}
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{padding:20px}
+  .stat-cards{grid-template-columns:1fr}
+  .score-breakdown{grid-template-columns:1fr}
+}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- âââ Toast âââ -->
+<div id="toast" class="toast"></div>
+
+<!-- âââ Landing Page âââ -->
+<div id="landingPage" class="landing">
+  <div class="landing-nav">
+    <div class="brand">Biz<span>Lens</span></div>
+    <div class="nav-btns">
+      <button class="btn btn-ghost" onclick="showModal('login')">Log in</button>
+      <button class="btn btn-primary" onclick="showModal('signup')">Get Started Free</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div>
+      <span class="hero-tag">For entrepreneurs & students</span>
+      <h1>Score any business idea in <em>under 3 minutes</em></h1>
+      <p>BizLens evaluates your idea across 11 weighted metrics â from market size to customer pain â and gives you a clear, data-backed viability score. No guesswork.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="showModal('signup')" style="padding:14px 32px;font-size:16px">Start Scoring â It's Free</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="stat-row">
+        <div class="mini-card">
+          <div class="label">Overall Score</div>
+          <div class="value amber">78.4</div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:78%"></div></div>
+        </div>
+        <div class="mini-card">
+          <div class="label">Grade</div>
+          <div class="value">B+</div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="mini-card">
+          <div class="label">Market Size</div>
+          <div class="value">8</div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:80%"></div></div>
+        </div>
+        <div class="mini-card">
+          <div class="label">Scalability</div>
+          <div class="value">9</div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:90%"></div></div>
+        </div>
+        <div class="mini-card">
+          <div class="label">Customer Pain</div>
+          <div class="value">7</div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:70%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">&#9881;</div>
+      <h3>11 Weighted Metrics</h3>
+      <p>Each metric is weighted by importance â customer pain and revenue model matter more than innovation novelty alone.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">&#9733;</div>
+      <h3>Instant Grade</h3>
+      <p>Get a letter grade from A+ to F with a numerical score, so you know exactly where your idea stands.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">&#128202;</div>
+      <h3>Track & Compare</h3>
+      <p>Save multiple ideas, compare scores side by side, and track how refinements improve your viability over time.</p>
+    </div>
+  </div>
+</div>
+
+<!-- âââ Auth Modals âââ -->
+<div id="signupModal" class="modal-overlay" onclick="if(event.target===this)closeModals()">
+  <div class="modal">
+    <button class="close" onclick="closeModals()">&times;</button>
+    <h2>Create your account</h2>
+    <p class="sub">Start scoring ideas in minutes</p>
+    <form onsubmit="handleSignup(event)">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signupName" placeholder="Mayank Sharma" required>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signupPass" placeholder="At least 6 characters" minlength="6" required>
+      </div>
+      <button type="submit" class="form-submit">Create Account</button>
+    </form>
+    <div class="form-switch">Already have an account? <a onclick="showModal('login')">Log in</a></div>
+  </div>
+</div>
+
+<div id="loginModal" class="modal-overlay" onclick="if(event.target===this)closeModals()">
+  <div class="modal">
+    <button class="close" onclick="closeModals()">&times;</button>
+    <h2>Welcome back</h2>
+    <p class="sub">Log in to your BizLens account</p>
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Your password" required>
+      </div>
+      <button type="submit" class="form-submit">Log In</button>
+    </form>
+    <div class="form-switch">Don't have an account? <a onclick="showModal('signup')">Sign up</a></div>
+  </div>
+</div>
+
+<!-- âââ New Idea Modal âââ -->
+<div id="newIdeaModal" class="modal-overlay" onclick="if(event.target===this)closeModals()">
+  <div class="modal">
+    <button class="close" onclick="closeModals()">&times;</button>
+    <h2>New Business Idea</h2>
+    <p class="sub">Give your idea a name and some details</p>
+    <form onsubmit="handleNewIdea(event)">
+      <div class="form-group">
+        <label>Idea Name</label>
+        <input type="text" id="ideaName" placeholder="e.g. AI Resume Builder" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="ideaDesc" placeholder="What does it do? What problem does it solve?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Industry</label>
+        <select id="ideaIndustry">
+          <option value="">Select industry...</option>
+          <option>Technology</option><option>Healthcare</option><option>Education</option>
+          <option>Finance</option><option>E-commerce</option><option>Food & Beverage</option>
+          <option>Sustainability</option><option>Entertainment</option><option>Real Estate</option>
+          <option>Transportation</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Target Audience</label>
+        <input type="text" id="ideaAudience" placeholder="e.g. College students, Small businesses">
+      </div>
+      <button type="submit" class="form-submit">Create Idea</button>
+    </form>
+  </div>
+</div>
+
+<!-- âââ App Shell âââ -->
+<div id="appShell" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand">Biz<span>Lens</span></div>
+    <nav>
+      <a href="#" class="active" data-page="dashboard"><span class="icon">&#9632;</span> Dashboard</a>
+      <a href="#" data-page="ideas"><span class="icon">&#9733;</span> My Ideas</a>
+      <a href="#" data-page="new"><span class="icon">&#10010;</span> Score New Idea</a>
+    </nav>
+    <div class="user-block">
+      <div class="user-avatar" id="userAvatar">M</div>
+      <div class="user-info">
+        <div class="name" id="userName">User</div>
+        <div class="email" id="userEmail">user@email.com</div>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()" title="Log out">&#10148;</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- Dashboard -->
+    <div id="dashboardPage" class="page">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <button class="btn btn-primary" onclick="showModal('newIdea')">+ New Idea</button>
+      </div>
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-label">Total Ideas</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Scored Ideas</div>
+          <div class="stat-value" id="statScored">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg. Score</div>
+          <div class="stat-value amber" id="statAvg">â</div>
+        </div>
+      </div>
+      <div class="top-ideas" id="topIdeasSection">
+        <h3>Top Performing Ideas</h3>
+        <div id="topIdeasList"></div>
+      </div>
+    </div>
+
+    <!-- Ideas List -->
+    <div id="ideasPage" class="page hidden">
+      <div class="page-header">
+        <h1>My Ideas</h1>
+        <button class="btn btn-primary" onclick="showModal('newIdea')">+ New Idea</button>
+      </div>
+      <div class="ideas-grid" id="ideasGrid"></div>
+    </div>
+
+    <!-- Scoring Wizard -->
+    <div id="scorePage" class="page hidden">
+      <div class="page-header">
+        <h1>Score: <span id="scoringIdeaName">â</span></h1>
+      </div>
+      <div class="wizard" id="scoringWizard">
+        <div class="wizard-progress" id="wizardProgress"></div>
+        <div id="wizardSteps"></div>
+        <div class="wizard-nav">
+          <button class="btn btn-outline" id="wizardPrev" onclick="wizardPrevStep()">Back</button>
+          <button class="btn btn-primary" id="wizardNext" onclick="wizardNextStep()">Next</button>
+        </div>
+      </div>
+      <div id="scoreResult" class="score-result hidden"></div>
+    </div>
+
+    <!-- New Idea shortcut page -->
+    <div id="newPage" class="page hidden">
+      <div class="page-header"><h1>Score a New Idea</h1></div>
+      <p style="color:var(--text-light);margin-bottom:20px">Create an idea first, then score it across 11 business metrics.</p>
+      <button class="btn btn-primary" onclick="showModal('newIdea')" style="padding:14px 28px">+ Create New Idea</button>
+    </div>
+  </main>
+</div>
+
+<script>
+// âââââââââââââââââââââââââââââââ
+// State
+// âââââââââââââââââââââââââââââââ
+let currentUser = null;
+let currentPage = 'dashboard';
+let scoringIdea = null;
+let wizardStep = 0;
+let scoringMetrics = {};
+
+const METRIC_DEFS = [
+  { key: 'customer_pain', label: 'Customer Pain Point', hint: 'How badly do customers need this solved? (1=nice-to-have, 10=desperate)', group: 'Market' },
+  { key: 'market_size', label: 'Market Size', hint: 'How large is the addressable market? (1=niche, 10=massive)', group: 'Market' },
+  { key: 'growth_potential', label: 'Growth Potential', hint: 'How fast is the market growing? (1=shrinking, 10=explosive)', group: 'Market' },
+  { key: 'competition', label: 'Competitive Advantage', hint: 'How strong is your edge vs. competitors? (1=none, 10=unbeatable)', group: 'Competition' },
+  { key: 'barrier_to_entry', label: 'Barrier to Entry', hint: 'How hard is it for others to copy you? (1=easy, 10=very hard)', group: 'Competition' },
+  { key: 'revenue_model', label: 'Revenue Model Clarity', hint: 'How clear and proven is the monetization strategy? (1=unclear, 10=proven)', group: 'Business' },
+  { key: 'scalability', label: 'Scalability', hint: 'Can this grow without proportional cost increase? (1=linear, 10=highly scalable)', group: 'Business' },
+  { key: 'funding_needs', label: 'Funding Feasibility', hint: 'How reasonable are funding requirements? (1=massive capital, 10=bootstrappable)', group: 'Business' },
+  { key: 'team_fit', label: 'Team Fit', hint: 'Does the team have the skills to execute? (1=no match, 10=perfect fit)', group: 'Execution' },
+  { key: 'timing', label: 'Market Timing', hint: 'Is the market ready for this now? (1=too early/late, 10=perfect timing)', group: 'Execution' },
+  { key: 'innovation', label: 'Innovation Level', hint: 'How novel is this approach? (1=copycat, 10=breakthrough)', group: 'Execution' },
+];
+
+const WIZARD_STEPS = [];
+const groups = [...new Set(METRIC_DEFS.map(m => m.group))];
+groups.forEach(g => {
+  WIZARD_STEPS.push({
+    title: g + ' Metrics',
+    desc: 'Rate each ' + g.toLowerCase() + ' factor from 1 to 10.',
+    metrics: METRIC_DEFS.filter(m => m.group === g)
+  });
+});
+
+// âââââââââââââââââââââââââââââââ
+// Toast
+// âââââââââââââââââââââââââââââââ
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// âââââââââââââââââââââââââââââââ
+// API Helpers
+// âââââââââââââââââââââââââââââââ
+async function api(url, opts = {}) {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+// âââââââââââââââââââââââââââââââ
+// Auth
+// âââââââââââââââââââââââââââââââ
+function showModal(type) {
+  closeModals();
+  if (type === 'signup') document.getElementById('signupModal').classList.add('active');
+  else if (type === 'login') document.getElementById('loginModal').classList.add('active');
+  else if (type === 'newIdea') document.getElementById('newIdeaModal').classList.add('active');
+}
+function closeModals() {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+}
+
+async function handleSignup(e) {
+  e.preventDefault();
+  try {
+    const data = await api('/api/auth/signup', { method: 'POST', body: {
+      name: document.getElementById('signupName').value,
+      email: document.getElementById('signupEmail').value,
+      password: document.getElementById('signupPass').value
+    }});
+    currentUser = data.user;
+    closeModals();
+    enterApp();
+    toast('Welcome to BizLens, ' + currentUser.name + '!');
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  try {
+    const data = await api('/api/auth/login', { method: 'POST', body: {
+      email: document.getElementById('loginEmail').value,
+      password: document.getElementById('loginPass').value
+    }});
+    currentUser = data.user;
+    closeModals();
+    enterApp();
+    toast('Welcome back, ' + currentUser.name + '!');
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function handleLogout() {
+  await api('/api/auth/logout', { method: 'POST' });
+  currentUser = null;
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('landingPage').classList.remove('hidden');
+}
+
+async function checkAuth() {
+  try {
+    const data = await api('/api/auth/me');
+    currentUser = data.user;
+    enterApp();
+  } catch { /* not logged in */ }
+}
+
+function enterApp() {
+  document.getElementById('landingPage').classList.add('hidden');
+  document.getElementById('appShell').classList.remove('hidden');
+  document.getElementById('userName').textContent = currentUser.name;
+  document.getElementById('userEmail').textContent = currentUser.email;
+  document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  navigateTo('dashboard');
+}
+
+// âââââââââââââââââââââââââââââââ
+// Navigation
+// âââââââââââââââââââââââââââââââ
+document.querySelectorAll('.sidebar nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    navigateTo(link.dataset.page);
+  });
+});
+
+function navigateTo(page) {
+  currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+  const target = document.getElementById(page + 'Page');
+  if (target) target.classList.remove('hidden');
+  const navLink = document.querySelector(`[data-page="${page}"]`);
+  if (navLink) navLink.classList.add('active');
+
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'ideas') loadIdeas();
+}
+
+// âââââââââââââââââââââââââââââââ
+// Dashboard
+// âââââââââââââââââââââââââââââââ
+async function loadDashboard() {
+  try {
+    const data = await api('/api/dashboard');
+    document.getElementById('statTotal').textContent = data.totalIdeas;
+    document.getElementById('statScored').textContent = data.scoredIdeas;
+    document.getElementById('statAvg').textContent = data.avgScore > 0 ? data.avgScore : 'â';
+
+    const list = document.getElementById('topIdeasList');
+    if (data.topIdeas.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128161;</div><p>No scored ideas yet. Create and score your first idea!</p><button class="btn btn-primary" onclick="showModal(\'newIdea\')">+ New Idea</button></div>';
+    } else {
+      list.innerHTML = data.topIdeas.map((idea, i) => `
+        <div class="top-idea-row">
+          <div class="top-idea-rank">${i + 1}</div>
+          <div class="top-idea-name">${esc(idea.name)}</div>
+          <div class="top-idea-score">${idea.score}</div>
+          <span class="grade-badge ${gradeClass(idea.grade)}">${idea.grade}</span>
+        </div>
+      `).join('');
+    }
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+// âââââââââââââââââââââââââââââââ
+// Ideas
+// âââââââââââââââââââââââââââââââ
+async function loadIdeas() {
+  try {
+    const data = await api('/api/ideas');
+    const grid = document.getElementById('ideasGrid');
+
+    if (data.ideas.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">&#128214;</div><p>No ideas yet. Create your first business idea!</p><button class="btn btn-primary" onclick="showModal(\'newIdea\')">+ New Idea</button></div>';
+      return;
+    }
+
+    grid.innerHTML = data.ideas.map(idea => `
+      <div class="idea-card ${idea.status || 'draft'}" onclick="openIdea('${idea.id}')">
+        <button class="delete-btn" onclick="event.stopPropagation();deleteIdea('${idea.id}','${esc(idea.name)}')" title="Delete">&#10005;</button>
+        <h3>${esc(idea.name)}</h3>
+        <div class="idea-desc">${esc(idea.description || 'No description')}</div>
+        <div class="idea-meta">
+          <span>${idea.industry || 'General'}</span>
+          ${idea.total_score ? `<span class="idea-score-pill grade-badge ${gradeClass(idea.grade)}">${idea.total_score} Â· ${idea.grade}</span>` : '<span>Draft</span>'}
+        </div>
+      </div>
+    `).join('');
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function handleNewIdea(e) {
+  e.preventDefault();
+  try {
+    const data = await api('/api/ideas', { method: 'POST', body: {
+      name: document.getElementById('ideaName').value,
+      description: document.getElementById('ideaDesc').value,
+      industry: document.getElementById('ideaIndustry').value,
+      target_audience: document.getElementById('ideaAudience').value
+    }});
+    closeModals();
+    document.getElementById('ideaName').value = '';
+    document.getElementById('ideaDesc').value = '';
+    document.getElementById('ideaIndustry').value = '';
+    document.getElementById('ideaAudience').value = '';
+    toast('Idea created! Now score it.');
+    startScoring(data.idea.id, data.idea.name);
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteIdea(id, name) {
+  if (!confirm('Delete "' + name + '"? This cannot be undone.')) return;
+  try {
+    await api('/api/ideas/' + id, { method: 'DELETE' });
+    toast('Idea deleted');
+    loadIdeas();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function openIdea(id) {
+  try {
+    const data = await api('/api/ideas/' + id);
+    const idea = data.idea;
+    if (idea.total_score) {
+      showScoreResult(idea);
+    } else {
+      startScoring(id, idea.name);
+    }
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+// âââââââââââââââââââââââââââââââ
+// Scoring Wizard
+// âââââââââââââââââââââââââââââââ
+function startScoring(ideaId, ideaName) {
+  scoringIdea = { id: ideaId, name: ideaName };
+  wizardStep = 0;
+  scoringMetrics = {};
+  METRIC_DEFS.forEach(m => scoringMetrics[m.key] = 5);
+
+  document.getElementById('scoringIdeaName').textContent = ideaName;
+  document.getElementById('scoreResult').classList.add('hidden');
+  document.getElementById('scoringWizard').classList.remove('hidden');
+
+  // Build steps
+  const progressHTML = WIZARD_STEPS.map((_, i) => `<div class="step" data-step="${i}"></div>`).join('');
+  document.getElementById('wizardProgress').innerHTML = progressHTML;
+
+  const stepsHTML = WIZARD_STEPS.map((step, i) => `
+    <div class="wizard-step" data-step="${i}">
+      <h3>${step.title}</h3>
+      <p class="step-desc">${step.desc}</p>
+      ${step.metrics.map(m => `
+        <div class="metric-group">
+          <label>${m.label} <span class="score-display" id="display_${m.key}">5</span></label>
+          <input type="range" class="metric-slider" min="1" max="10" value="5" data-metric="${m.key}"
+            oninput="updateMetric('${m.key}', this.value)">
+          <div class="metric-hint">${m.hint}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+  document.getElementById('wizardSteps').innerHTML = stepsHTML;
+
+  navigateTo('score');
+  updateWizardUI();
+}
+
+function updateMetric(key, val) {
+  scoringMetrics[key] = parseInt(val);
+  document.getElementById('display_' + key).textContent = val;
+}
+
+function updateWizardUI() {
+  document.querySelectorAll('.wizard-step').forEach((el, i) => {
+    el.classList.toggle('active', i === wizardStep);
+  });
+  document.querySelectorAll('.wizard-progress .step').forEach((el, i) => {
+    el.classList.remove('done', 'current');
+    if (i < wizardStep) el.classList.add('done');
+    if (i === wizardStep) el.classList.add('current');
+  });
+  document.getElementById('wizardPrev').style.visibility = wizardStep === 0 ? 'hidden' : 'visible';
+  document.getElementById('wizardNext').textContent = wizardStep === WIZARD_STEPS.length - 1 ? 'Get Score' : 'Next';
+}
+
+function wizardPrevStep() {
+  if (wizardStep > 0) { wizardStep--; updateWizardUI(); }
+}
+
+async function wizardNextStep() {
+  if (wizardStep < WIZARD_STEPS.length - 1) {
+    wizardStep++;
+    updateWizardUI();
+  } else {
+    // Submit scores
+    try {
+      const data = await api('/api/ideas/' + scoringIdea.id + '/score', {
+        method: 'POST', body: scoringMetrics
+      });
+      document.getElementById('scoringWizard').classList.add('hidden');
+      const idea = { ...scoringIdea, ...scoringMetrics, total_score: data.score.total_score, grade: data.score.grade };
+      showScoreResult(idea);
+      toast('Idea scored: ' + data.score.grade + ' (' + data.score.total_score + ')');
+    } catch (err) { toast(err.message, 'error'); }
+  }
+}
+
+function showScoreResult(idea) {
+  navigateTo('score');
+  document.getElementById('scoringWizard').classList.add('hidden');
+  document.getElementById('scoringIdeaName').textContent = idea.name;
+
+  const score = idea.total_score;
+  const grade = idea.grade;
+  let verdict = '';
+  if (score >= 80) verdict = 'Excellent potential â this idea has strong fundamentals.';
+  else if (score >= 65) verdict = 'Promising idea with solid metrics. A few areas to strengthen.';
+  else if (score >= 50) verdict = 'Moderate potential. Needs work on weaker areas before moving forward.';
+  else verdict = 'High risk. Significant improvements needed across multiple dimensions.';
+
+  const metricLabels = {};
+  METRIC_DEFS.forEach(m => metricLabels[m.key] = m.label);
+
+  const breakdown = METRIC_DEFS.map(m => {
+    const val = idea[m.key] || 0;
+    return `<div class="breakdown-item"><span class="metric-name">${m.label}</span><span class="metric-val">${val}/10</span></div>`;
+  }).join('');
+
+  // Draw radar
+  const radarHTML = '<div class="radar-wrap"><canvas id="radarChart" width="320" height="320"></canvas></div>';
+
+  document.getElementById('scoreResult').innerHTML = `
+    <div class="score-circle" style="border-color:${score >= 70 ? 'var(--green)' : score >= 50 ? 'var(--amber)' : 'var(--red)'}">
+      <div class="number">${score}</div>
+      <div class="out-of">/ 100</div>
+    </div>
+    <div class="score-grade" style="color:${score >= 70 ? 'var(--green)' : score >= 50 ? 'var(--amber-dark)' : 'var(--red)'}">${grade}</div>
+    <p class="score-verdict">${verdict}</p>
+    ${radarHTML}
+    <div class="score-breakdown">${breakdown}</div>
+    <div style="margin-top:28px;display:flex;gap:12px;justify-content:center">
+      <button class="btn btn-outline" onclick="navigateTo('ideas')">Back to Ideas</button>
+      <button class="btn btn-primary" onclick="startScoring('${idea.id}','${esc(idea.name)}')">Re-score</button>
+    </div>
+  `;
+  document.getElementById('scoreResult').classList.remove('hidden');
+
+  // Draw radar chart
+  setTimeout(() => drawRadar(idea), 100);
+}
+
+function drawRadar(idea) {
+  const canvas = document.getElementById('radarChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 320, H = 320, cx = W/2, cy = H/2, R = 120;
+  canvas.width = W; canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+
+  const metrics = METRIC_DEFS.map(m => ({ label: m.label.split(' ')[0], value: idea[m.key] || 0 }));
+  const n = metrics.length;
+  const angleStep = (Math.PI * 2) / n;
+
+  // Grid
+  for (let ring = 2; ring <= 10; ring += 2) {
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const angle = i * angleStep - Math.PI / 2;
+      const r = (ring / 10) * R;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = '#e5e5ea';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Axes + labels
+  ctx.font = '10px DM Sans';
+  ctx.fillStyle = '#6b6b80';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < n; i++) {
+    const angle = i * angleStep - Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+    ctx.strokeStyle = '#e5e5ea';
+    ctx.stroke();
+    const lx = cx + (R + 18) * Math.cos(angle);
+    const ly = cy + (R + 18) * Math.sin(angle);
+    ctx.fillText(metrics[i].label, lx, ly + 3);
+  }
+
+  // Data polygon
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    const idx = i % n;
+    const angle = idx * angleStep - Math.PI / 2;
+    const r = (metrics[idx].value / 10) * R;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.fillStyle = 'rgba(232,168,56,0.18)';
+  ctx.fill();
+  ctx.strokeStyle = '#e8a838';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Dots
+  for (let i = 0; i < n; i++) {
+    const angle = i * angleStep - Math.PI / 2;
+    const r = (metrics[i].value / 10) * R;
+    ctx.beginPath();
+    ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#e8a838';
+    ctx.fill();
+  }
+}
+
+// âââââââââââââââââââââââââââââââ
+// Helpers
+// âââââââââââââââââââââââââââââââ
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function gradeClass(g) {
+  if (!g) return '';
+  if (g.startsWith('A')) return 'grade-a';
+  if (g.startsWith('B')) return 'grade-b';
+  if (g.startsWith('C')) return 'grade-c';
+  return 'grade-d';
+}
+
+// âââââââââââââââââââââââââââââââ
+// Init
+// âââââââââââââââââââââââââââââââ
+checkAuth();
+</script>
+</body>
+</html>
